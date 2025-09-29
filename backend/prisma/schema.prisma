@@ -39,6 +39,8 @@ model Cart {
   productId Int
   quantity  Int
   createdAt DateTime @default(now())
+
+  @@unique([userId, productId], name: "user_product_unique")
 }
 
 model Order {
