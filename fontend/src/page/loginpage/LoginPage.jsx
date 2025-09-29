@@ -1,10 +1,8 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { loginUser } from "../../store/authSlice";
+import { loginUser, checkCurrentUser } from "../../store/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-
-
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -17,42 +15,37 @@ const LoginPage = () => {
     password: "",
   });
 
-  const [checkLogin, setCheckLogin] = useState(false);
+  const [update, setUpdate] = useState(false);
+
   const handleChange = (e) => {
     setLoginFromData({
       ...loginFormData,
-      [e.target.name]: e.target.value
-    })
-
+      [e.target.name]: e.target.value,
+    });
   };
-  const handleLogin = (e) => {
+  const handleLogin = async(e) => {
     e.preventDefault();
-
-    dispatch(loginUser(loginFormData));
-
-    if(!checkLogin) return ;
-
-
-    console.log('Login success')
-
-    navigate('/')
-
+    const checkAuth = await dispatch(loginUser(loginFormData));
+    if (loginUser.fulfilled.match(checkAuth)) {
+      // ถ้า login สำเร็จ → เรียก checkCurrentUser
+      dispatch(checkCurrentUser());
+      navigate("/");
+    } else {
+      console.log("Login failed:", checkAuth.payload);
+    }
+    setUpdate(prev=>!prev)
+    navigate("/");
   };
 
+  useEffect(() => {
+    console.log("user in loginpage", user);
+  }, [user]);
 
-  useEffect(()=>{
-    if(user){
-      setCheckLogin(true)
-    }else{
-      setCheckLogin(false)
-    }
-
-  },[user])
   const handleLogout = () => {};
 
   return (
     <div className="hero bg-base-200 min-h-screen">
-      <Toaster/>
+      <Toaster />
       <div className="hero bg-gradient-to-br from-base-200 to-base-300 min-h-screen">
         <div className="hero-content flex-col lg:flex-row-reverse gap-10">
           <div className="card bg-base-100 w-screen max-w-md shadow-2xl rounded-2xl">
@@ -66,40 +59,40 @@ const LoginPage = () => {
                   <div>
                     <label className="label font-medium">Email</label>
                     <div>
-                    <label className="input input-bordered flex items-center gap-2 h-12 w-full">
-                      <svg
-                        className="h-[1em] opacity-50"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                      >
-                        <g
-                          strokeLinejoin="round"
-                          strokeLinecap="round"
-                          strokeWidth="2.5"
-                          fill="none"
-                          stroke="currentColor"
+                      <label className="input input-bordered flex items-center gap-2 h-12 w-full">
+                        <svg
+                          className="h-[1em] opacity-50"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
                         >
-                          <rect
-                            width="20"
-                            height="16"
-                            x="2"
-                            y="4"
-                            rx="2"
-                          ></rect>
-                          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-                        </g>
-                      </svg>
-                      <input
-                        type="email"
-                        name="email"
-                        value={loginFormData.email}
-                        onChange={handleChange}
-                        required
-                        placeholder="you@example.com"
-                        className="grow"
-                      />
-                    </label>
-                  </div>
+                          <g
+                            strokeLinejoin="round"
+                            strokeLinecap="round"
+                            strokeWidth="2.5"
+                            fill="none"
+                            stroke="currentColor"
+                          >
+                            <rect
+                              width="20"
+                              height="16"
+                              x="2"
+                              y="4"
+                              rx="2"
+                            ></rect>
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                          </g>
+                        </svg>
+                        <input
+                          type="email"
+                          name="email"
+                          value={loginFormData.email}
+                          onChange={handleChange}
+                          required
+                          placeholder="you@example.com"
+                          className="grow"
+                        />
+                      </label>
+                    </div>
                   </div>
 
                   {/* Password */}
@@ -129,7 +122,7 @@ const LoginPage = () => {
                       </svg>
 
                       <input
-                        type={!showPassword ? "password": "text"}
+                        type={!showPassword ? "password" : "text"}
                         name="password"
                         value={loginFormData.password}
                         onChange={handleChange}
@@ -139,7 +132,7 @@ const LoginPage = () => {
                         pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
                         className="grow"
                       />
-                      <button onClick={()=> setShowPassword((prev)=>!prev)}>
+                      <button onClick={() => setShowPassword((prev) => !prev)}>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"

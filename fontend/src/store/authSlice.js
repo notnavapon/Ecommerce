@@ -58,7 +58,7 @@ export const checkCurrentUser = createAsyncThunk(
 );
 
 export const logoutUser = createAsyncThunk(
-  "auth/loginUser",
+  "auth/logoutUser",
   async (_, thunkAPI) => {
     try {
       const response = await api.post("/auth/logout");
@@ -84,7 +84,7 @@ const initialState = {
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {}, // ไม่มี logout เพราะเน้น register อย่างเดียว
+  reducers: {}, 
   extraReducers: (builder) => {
     builder
 
@@ -101,11 +101,16 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      //logout
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.loading = false;
       })
 
       //checkAuth

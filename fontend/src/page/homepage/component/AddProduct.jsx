@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { addProduct } from "../../../store/productSlice";
+import { Toaster } from "react-hot-toast";
 
 const AddProduct = ({ onUpdataProduct }) => {
   const dispatch = useDispatch();
@@ -28,11 +29,11 @@ const AddProduct = ({ onUpdataProduct }) => {
       // สร้าง URL ชั่วคราวจากไฟล์
       setPreviewPic(URL.createObjectURL(file));
     }
-    onUpdataProduct(prev=>!prev)
     console.log("productPic:", productPic);
   };
-  const handleAddproduct =  (e) => {
-     e.preventDefault();
+
+  const handleAddproduct = async (e) => {
+    e.preventDefault();
 
     const product = new FormData();
     product.append("name", productFormData.name);
@@ -42,105 +43,111 @@ const AddProduct = ({ onUpdataProduct }) => {
     if (productPic) {
       product.append("image", productPic);
     }
-
     //check product before send api
     // for (let pair of product.entries()) {
     //   console.log(pair[0] + ": ", pair[1]);
     // }
-    dispatch(addProduct(product));
-    onUpdataProduct(prev=>!prev)
+    const newProduct = await dispatch(addProduct(product));
+
+    if (addProduct.fulfilled.match(newProduct)) {
+          // ถ้า login สำเร็จ → เรียก checkCurrentUser
+          dispatch(checkProduct());
+          onUpdataProduct((prev) => !prev);
+        } else {
+          console.log("Add product fail:", checkAuth.payload);
+        }
   };
-  
+
   return (
-    <div>
-      <label className="relative cursor-pointer w-24 h-24 rounded-full overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-primary transition">
-        {previewPic && (
+    <div className="flex flex-col items-center">
+      <Toaster />
+
+      {/* Image Preview */}
+      <label className="relative cursor-pointer w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center mb-6 hover:border-primary transition">
+        {previewPic ? (
           <img
             src={previewPic}
-            alt="profilepic Preview"
+            alt="preview"
             className="w-full h-full object-cover"
           />
+        ) : (
+          <span className="text-gray-400">Upload</span>
         )}
+        <input
+          type="file"
+          className="absolute inset-0 opacity-0 cursor-pointer"
+          onChange={handleFileChange}
+          accept="image/*"
+        />
       </label>
+
       <form
         onSubmit={handleAddproduct}
-        className="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6 space-y-4"
+        className="w-full max-w-lg bg-white rounded-xl shadow-lg p-8 space-y-6"
       >
-        <h2 className="text-2xl font-bold mb-4 text-gray-700">Add Product</h2>
+        <h2 className="text-3xl font-bold text-gray-700 text-center mb-6">
+          Add Product
+        </h2>
 
         {/* Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
+          <label className="block text-sm font-medium text-gray-600 mb-2">
             Name
           </label>
           <input
             type="text"
             name="name"
             placeholder="Product name"
-            className="input input-bordered w-full"
+            className="input input-bordered w-full rounded-lg"
             onChange={handleChange}
           />
         </div>
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
+          <label className="block text-sm font-medium text-gray-600 mb-2">
             Description
           </label>
           <textarea
             name="description"
             placeholder="Product description"
-            className="textarea textarea-bordered w-full"
+            className="textarea textarea-bordered w-full rounded-lg"
             onChange={handleChange}
           />
         </div>
 
-        {/* Price & Stock in 2 columns */}
+        {/* Price & Stock */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
+            <label className="block text-sm font-medium text-gray-600 mb-2">
               Price
             </label>
             <input
               type="number"
               name="price"
               placeholder="0.00"
-              className="input input-bordered w-full"
+              className="input input-bordered w-full rounded-lg"
               onChange={handleChange}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
+            <label className="block text-sm font-medium text-gray-600 mb-2">
               Stock
             </label>
             <input
               type="number"
               name="stock"
               placeholder="0"
-              className="input input-bordered w-full"
+              className="input input-bordered w-full rounded-lg"
               onChange={handleChange}
             />
           </div>
         </div>
 
-        {/* File Upload */}
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Image
-          </label>
-          <input
-            type="file"
-            name="image"
-            accept="image/*"
-            className="file-input file-input-bordered w-full"
-            onChange={handleFileChange}
-          />
-        </div>
-
-        {/* Submit Button */}
+        {/* Submit */}
         <button
           type="submit"
-          className="btn btn-primary w-full mt-4 hover:scale-105 transition-transform"
+          className="btn btn-primary w-full py-3 text-lg font-semibold hover:scale-105 transition-transform rounded-lg"
         >
           Add Product
         </button>

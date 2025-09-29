@@ -49,7 +49,11 @@ export const uploadFile = (fileName) => {
         };
 
         const result = await streamUpload();
-        req.file.path = result.secure_url; // use in controller
+        const file = {
+          public_id: result.public_id,
+          url: result.secure_url,
+        };
+        req.file.path = file; // use in controller
         next();
       } catch (err) {
         next(err);

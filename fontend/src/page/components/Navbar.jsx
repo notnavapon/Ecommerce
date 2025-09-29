@@ -6,6 +6,7 @@ import { useState } from "react";
 
 
 import Cart from "./Cart";
+import { useEffect } from "react";
 
 function NavBar() {
   const dispatch = useDispatch();
@@ -17,11 +18,14 @@ function NavBar() {
     setOpenCart(value)
   }
 
-  console.log("user", user);
 
   const handleLogout = () => {
     dispatch(logoutUser());
   };
+
+  useEffect(()=>{
+
+  })
   return (
     <>
     <div className="navbar bg-primary text-primary-content shadow-md px-6">
@@ -86,7 +90,7 @@ function NavBar() {
               </li>
               <li>
                 <Link
-                  to="/settings"
+                  to="/setting"
                   className="flex justify-between items-center w-full px-2 py-1"
                 >
                   Settings
@@ -136,6 +140,7 @@ function NavBar() {
         )}
       </div>
     </div>
+    
     <Cart value={openCart} onChange={handleCart}/>
     </>
   );

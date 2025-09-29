@@ -5,7 +5,6 @@ import { useEffect } from "react";
 
 import AddProduct from "./component/AddProduct";
 import { useState } from "react";
-import { Toaster } from "react-hot-toast";
 
 const Homepage = () => {
   const dispatch = useDispatch();
@@ -17,17 +16,14 @@ const Homepage = () => {
     checkNewProduct(value)
   }
   const { listProduct } = useSelector((state) => state.product);
-  console.log("product list", listProduct);
 
   useEffect(() => {
     dispatch(checkProduct());
-    console.log("useEffect in homepage")
   }, [newProduct]);
 
   return (
     <div className="min-h-screen">
       <AddProduct onUpdataProduct={handleCheckAddproduct}/>
-      <Toaster/>
 
       {/* list product */}
       <div className="container mx-auto px-4 py-8 ">
@@ -36,18 +32,18 @@ const Homepage = () => {
           {listProduct.map((product) => (
             <div
               key={product.id}
-              className="bg-white shadow-md rounded-lg overflow-hidden 
+              className=" shadow-md rounded-lg overflow-hidden 
              hover:shadow-xl transition-shadow duration-300
              transform hover:scale-105 transition-transform duration-300"
             >
               <img
-                src={product.image}
+                src={product.image.url}
                 alt={product.name}
                 className="w-full h-48 object-cover"
               />
               <div className="p-4">
                 <h2 className="text-lg font-semibold mb-2">{product.name}</h2>
-                <p className="text-gray-700 font-medium mb-2">
+                <p className=" font-medium mb-2">
                   ${product.price}
                 </p>
                 <p
@@ -63,8 +59,8 @@ const Homepage = () => {
                   {/* Input + +,- buttons */}
                   <div className="join w-full">
                     <input
-                      type="email"
-                      placeholder="Enter your email"
+                      type="text"
+                      placeholder="amount"
                       className="input input-bordered join-item flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                     <button className="btn  join-item hover:bg-blue-600 transition-colors">

@@ -25,7 +25,7 @@ model Product {
   description String?
   price       Float
   stock       Int
-  image       String
+  image       Json
   createdAt   DateTime @default(now())
   cartItems   Cart[]
   orderItems  OrderItem[]
