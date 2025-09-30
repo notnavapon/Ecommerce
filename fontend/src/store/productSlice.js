@@ -6,11 +6,11 @@ import toast from "react-hot-toast";
 
 export const addProduct = createAsyncThunk(
   "product/addProduct",
-  async (userData, thunkAPI) => {
+  async (product, thunkAPI) => {
     const toastId = toast.loading("adding..");
     try {
-      console.log("addprodcut in slice: ", userData);
-      const response = await api.post("/product/add", userData);
+      console.log("addprodcut in slice: ", product);
+      const response = await api.post("/product/add", product);
       return (
         toast.success("Add product successfully!", { id: toastId }),
         response.data

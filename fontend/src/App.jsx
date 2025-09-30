@@ -9,13 +9,13 @@ import LoginPage from "./page/loginpage/LoginPage";
 import RegisterPage from "./page/registerpage/RegisterPage";
 import SettingPage from "./page/settingpage/SettingPage";
 
+
 import { checkCurrentUser } from "./store/authSlice";
 
 function App() {
   const dispatch = useDispatch();
-  const { user,authuser } = useSelector((state) => state.auth);
+  const { user} = useSelector((state) => state.auth);
   // console.log("userinapp:", user);
-  // console.log("authuserinapp:", authuser);
 
   useEffect(() => {
     if (!user) {
@@ -24,7 +24,7 @@ function App() {
   }, []);
 
   return (
-    <div data-theme="ligth">
+    <div data-theme="dim">
       <BrowserRouter>
         <NavBar />
         <div className="min-h-screen">

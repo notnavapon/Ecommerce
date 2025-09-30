@@ -3,44 +3,40 @@ import prisma from "../config/prismaClient.js";
 export const addCart = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { productId, quantity } = req.body;
+    console.log("body in addcart:",req.body)
+    const productId = parseInt(req.body.productId);
+    const quantity = parseInt(req.body.quantity);
 
     if (!productId || quantity <= 0) {
       return res.status(400).json({ message: "Invalid productId or quantity" });
     }
 
-    const product = await prisma.product.findUnique({
-      where: { id: parseInt(productId) },
-    });
-
+    const product = await prisma.product.findUnique({ where: { id: productId } });
     if (!product) return res.status(404).json({ message: "Product not found" });
-    if (quantity > product.stock)
+    if (quantity > product.stock) {
       return res.status(400).json({ message: "Not enough stock" });
-
-    const existingCartItem = await prisma.cart.findUnique({
-      where: {
-        user_product_unique: { userId, productId },
-      },
-    });
-
-    let cartItem;
-    if (existingCartItem) {
-      cartItem = await prisma.cart.update({
-        where: { id: existingCartItem.id },
-        data: { quantity: existingCartItem.quantity + quantity },
-      });
-    } else {
-      cartItem = await prisma.cart.create({
-        data: { userId, productId, quantity },
-      });
     }
 
-    return res.status(200).json({ message: "Cart added", cartItem });
+    const existing = await prisma.cart.findUnique({
+      where: { user_product_unique: { userId, productId } },
+    });
+
+    const cartItem = existing
+      ? await prisma.cart.update({
+          where: { id: existing.id },
+          data: { quantity: existing.quantity + quantity },
+        })
+      : await prisma.cart.create({
+          data: { userId, productId, quantity },
+        });
+
+    res.status(200).json({ message: "Cart added", cartItem });
   } catch (error) {
-    console.error("[error] addcart in cartController:", error);
+    console.error("[addCart error]:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 export const updateCart = async (req, res) => {
   try {
