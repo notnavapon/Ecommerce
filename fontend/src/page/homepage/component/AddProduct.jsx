@@ -59,7 +59,6 @@ const AddProduct = ({ isOpen, onClose, onUpdateProduct }) => {
     const newProduct = await dispatch(addProduct(product));
 
     if (addProduct.fulfilled.match(newProduct)) {
-      // ถ้า login สำเร็จ → เรียก checkCurrentUser
       dispatch(checkProduct());
       resetForm();
       onUpdateProduct((prev) => !prev);

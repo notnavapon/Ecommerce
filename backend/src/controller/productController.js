@@ -3,7 +3,7 @@ import prisma from "../config/prismaClient.js";
 
 export const addProduct = async (req, res) => {
   const { name, description, price, stock } = req.body;
-  console.log(req.user)
+  console.log(req.user);
 
   const { role } = req.user;
   if (role !== "admin") {
@@ -119,13 +119,21 @@ export const deleteProduct = async (req, res) => {
   }
 
   try {
+    //delete product in cart when have product
+    const deleteProductInCart = await prisma.cart.deleteMany({
+      where: { productId: Number(req.params.id) },
+    });
+
     // delete image on cloudinary
-    const product = await prisma.product.findUnique({where:{id: Number(req.params.id) }})
-    const deleteImage = await cloudinary.uploader.destroy(product.image.public_id);
+    const product = await prisma.product.findUnique({
+      where: { id: Number(req.params.id) },
+    });
+    const deleteImage = await cloudinary.uploader.destroy(
+      product.image.public_id
+    );
     if (deleteImage.result !== "ok") {
       return res.status(400).json({ message: "Failed to delete image" });
     }
-
 
     //delete
     console.log("Call deleteProduct");

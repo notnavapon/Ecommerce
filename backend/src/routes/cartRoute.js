@@ -6,10 +6,10 @@ const router = express.Router();
 
 
 
-router.post('/addcart',protectAuth,addCart)
-router.patch('/updatecart',protectAuth,updateCart)
-router.delete('/deletecart',protectAuth, deleteCart)
-router.get('/getcart',protectAuth,getCart)
+router.post('/',protectAuth,addCart)
+router.patch('/',protectAuth,updateCart)
+router.delete('/',protectAuth, deleteCart)
+router.get('/',protectAuth,getCart)
 
 
 export default router;

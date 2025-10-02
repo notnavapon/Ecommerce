@@ -7,10 +7,10 @@ import {uploadFile} from '../middleware/uploadMiddleware.js'
 const router = express.Router();
 
 
-router.post('/add',protectAuth,uploadFile("image"), addProduct);
-router.patch('/updatestock/:id',protectAuth,updateStockProduct);
-router.get('/checkproduct',checkProduct);
+router.post('/',protectAuth,uploadFile("image"), addProduct);
+router.patch('/:id/stock',protectAuth,updateStockProduct);
+router.get('/',checkProduct);
 
-router.patch('/updateproduct/:id',protectAuth,updateProduct);
-router.delete('/deleteproduct/:id',protectAuth,deleteProduct);
+router.patch('/:id/stock',protectAuth,updateProduct);
+router.delete('/:id',protectAuth,deleteProduct);
 export default router;

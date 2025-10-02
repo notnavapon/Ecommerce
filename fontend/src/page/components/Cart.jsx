@@ -9,14 +9,13 @@ import {
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 import { useDispatch, useSelector } from "react-redux";
-import { getCart } from "../../store/cartSlice";
-
+import { getCart, deleteCart ,updateCart } from "../../store/cartSlice";
+import { Toaster } from "react-hot-toast";
 
 const Cart = ({ value, onChange }) => {
   const dispatch = useDispatch();
-  const { loadcart } = useSelector((state) => state.cart);
-
-  console.log(loadcart)
+  const { loadcart, reload } = useSelector((state) => state.cart);
+  const { reloadOnProduct } = useSelector((state) => state.product);
 
   const handleClick = () => {
     if (value === true) {
@@ -24,12 +23,34 @@ const Cart = ({ value, onChange }) => {
     }
   };
 
-  useEffect(()=>{
-    dispatch(getCart());
-  },[])
+  const handleRemove = (productId) => {
+    console.log("handleRemove");
+    const deleteCartSuccess = dispatch(deleteCart({ productId }));
+
+    if (deleteCart.fulfilled.match(deleteCartSuccess)) {
+      dispatch(getCart());
+    }
+  };
+
+  const handleIncreaseQuantity = (productId, quantity) => {
+    quantity +=1;
+    dispatch(updateCart({productId, quantity}))
+  };
+
+  const handleDecreaseQuantity = (productId, quantity) => {
+    quantity -=1;
+    dispatch(updateCart({productId, quantity}))
+  };
+
+  useEffect(() => {
+    if (reload || reloadOnProduct) {
+      dispatch(getCart());
+    }
+  }, [reload, reloadOnProduct]);
 
   return (
     <div>
+      <Toaster/>
       <Dialog open={value} onClose={handleClick} className="relative z-10">
         <DialogBackdrop
           transition
@@ -82,22 +103,57 @@ const Cart = ({ value, onChange }) => {
                                 <div>
                                   <div className="flex justify-between text-base font-medium text-gray-900">
                                     <h3>
-                                      <a href={product.href}>{product.product.name}</a>
+                                      <a href={product.href}>
+                                        {product.product.name}
+                                      </a>
                                     </h3>
-                                    <p className="ml-4">{product.product.price}</p>
+                                    <p className="ml-4">
+                                      {product.product.price}
+                                    </p>
                                   </div>
                                   <p className="mt-1 text-sm text-gray-500">
                                     {product.color}
                                   </p>
                                 </div>
                                 <div className="flex flex-1 items-end justify-between text-sm">
-                                  <p className="text-gray-500">
-                                    Qty {product.quantity}
-                                  </p>
+                                  <div className="flex flex-1 items-end justify-between text-sm">
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          handleDecreaseQuantity(
+                                            product.productId, product.quantity
+                                          )
+                                        }
+                                        className="flex size-6 items-center justify-center rounded border border-gray-300 text-gray-600 hover:bg-gray-100"
+                                      >
+                                        -
+                                      </button>
+                                      <p className="text-gray-500">
+                                        Qty {product.quantity}
+                                      </p>
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          handleIncreaseQuantity(
+                                            product.productId, product.quantity
+                                          )
+                                        }
+                                        className="flex size-6 items-center justify-center rounded border border-gray-300 text-gray-600 hover:bg-gray-100"
+                                      >
+                                        +
+                                      </button>
+                                    </div>
+
+
+                                  </div>
 
                                   <div className="flex">
                                     <button
                                       type="button"
+                                      onClick={() =>
+                                        handleRemove(product.productId)
+                                      }
                                       className="font-medium text-indigo-600 hover:text-indigo-500"
                                     >
                                       Remove

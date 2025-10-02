@@ -41,10 +41,14 @@ export const addCart = async (req, res) => {
 export const updateCart = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { productId, quantity } = req.body;
+    const productId = parseInt(req.body.productId);
+    const quantity = parseInt(req.body.quantity);
     console.log(productId, quantity);
 
-    if (!productId || quantity <= 0) {
+    if (quantity <= 0) {
+      return res.status(400).json({ message: "Quantity should not be zero. Do you want to remove this item?" });
+    }
+    else if (!productId ) {
       return res.status(400).json({ message: "Invalid productId or quantity" });
     }
 
@@ -53,6 +57,7 @@ export const updateCart = async (req, res) => {
     });
 
     if (!product) return res.status(404).json({ message: "Product not found" });
+    
     if (quantity > product.stock)
       return res.status(400).json({ message: "Not enough stock" });
 
@@ -78,14 +83,15 @@ export const updateCart = async (req, res) => {
 };
 export const deleteCart = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { productId } = req.body;
+    const userId = parseInt(req.user.id);
+    const productId  = parseInt(req.body.productId);
+    console.log(userId, productId)
 
     const searchcart = await prisma.cart.findUnique({
       where: {
         user_product_unique: {
-          userId: parseInt(userId),
-          productId: parseInt(productId),
+          userId: userId,
+          productId: productId,
         },
       },
     });

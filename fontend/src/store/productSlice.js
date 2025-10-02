@@ -10,7 +10,7 @@ export const addProduct = createAsyncThunk(
     const toastId = toast.loading("adding..");
     try {
       console.log("addprodcut in slice: ", product);
-      const response = await api.post("/product/add", product);
+      const response = await api.post("/product/", product);
       return (
         toast.success("Add product successfully!", { id: toastId }),
         response.data
@@ -28,7 +28,7 @@ export const checkProduct = createAsyncThunk(
   "product/checkProduct",
   async (thunkAPI) => {
     try {
-      const response = await api.get("/product/checkproduct");
+      const response = await api.get("/product/");
       return (response.data);
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -42,7 +42,7 @@ export const updateProduct = createAsyncThunk(
   async ({ id, data }, thunkAPI) => {
     const toastId = toast.loading("Updating product..");
     try {
-      const response = await api.patch("/product/updateproduct/" + id, data);
+      const response = await api.patch("/product/" + id+"/product", data);
       toast.success("Update product successfully!", { id: toastId });
       return response.data;
     } catch (error) {
@@ -59,7 +59,7 @@ export const updateStockProduct = createAsyncThunk(
     const toastId = toast.loading("Updating stock product..");
     try {
       console.log("id:", id, ", data:", data);
-      const response = await api.patch("/product/updatestock/" + id, data);
+      const response = await api.patch("/product/" + id+"/stock", data);
       toast.success("Update stock product successfully!", { id: toastId });
       return response.data;
     } catch (error) {
@@ -77,13 +77,13 @@ export const deleteProduct = createAsyncThunk(
     const toastId = toast.loading("Deleting product..");
     console.log(id);
     try {
-      const response = await api.delete("/product/deleteproduct/" + id);
+      const response = await api.delete("/product/" + id);
       toast.success("Deleted product successfully!", { id: toastId });
       return response.data;
     } catch (error) {
       toast.error(error.response?.data?.message, { id: toastId });
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Something went wrong"
+        error.response?.data || "Error in Delete Product"
       );
     }
   }
@@ -112,7 +112,7 @@ const productSlice = createSlice({
       .addCase(addProduct.fulfilled, (state, action) => {
         state.product = action.payload.product;
         if (action.payload?.product) {
-          state.listProduct.push(action.payload.product); // อัปเดตทันที
+          state.listProduct.push(action.payload.product); // upadate now
         }
       })
       .addCase(addProduct.rejected, (state, action) => {

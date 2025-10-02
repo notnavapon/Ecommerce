@@ -5,6 +5,8 @@ import {
   updateStockProduct,
   deleteProduct,
 } from "../../store/productSlice";
+
+import { getCart } from "../../store/cartSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Toaster } from "react-hot-toast";
 
@@ -72,9 +74,13 @@ const SettingPage = () => {
     }
   };
 
-  const handleDeleteProduct = () => {
+  const handleDeleteProduct = async () => {
     console.log("id delete on settingpage:", formValues);
-    dispatch(deleteProduct(formValues.id));
+    const comfirmDelete = await dispatch(deleteProduct(formValues.id));
+
+    if(deleteProduct.fulfilled.match(comfirmDelete)){
+      dispatch(getCart());
+    }
     setIsOpen(false);
   };
 

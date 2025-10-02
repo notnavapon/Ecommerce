@@ -6,6 +6,7 @@ import { ShoppingCart, Package, Plus, Minus, Filter } from "lucide-react";
 import { checkProduct } from "../../store/productSlice";
 import { addProductToCart, getCart } from "../../store/cartSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { Toaster } from "react-hot-toast";
 
 const Homepage = () => {
   const dispatch = useDispatch();

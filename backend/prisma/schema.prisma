@@ -26,6 +26,7 @@ model Product {
   price       Float
   stock       Int
   image       Json
+  status      String @default("show")
   createdAt   DateTime @default(now())
   cartItems   Cart[]
   orderItems  OrderItem[]
@@ -60,4 +61,6 @@ model OrderItem {
   productId Int
   quantity  Int
   price     Float
+
+  @@unique([orderId, productId], name: "order_product_unique")
 }
