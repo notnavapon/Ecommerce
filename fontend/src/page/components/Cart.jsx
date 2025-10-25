@@ -9,12 +9,14 @@ import {
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 import { useDispatch, useSelector } from "react-redux";
-import { getCart, deleteCart ,updateCart } from "../../store/cartSlice";
+import { getCart, deleteCart, updateCart } from "../../store/cartSlice";
 import { Toaster } from "react-hot-toast";
+
+import { addOrder } from "../../store/orderSlice";
 
 const Cart = ({ value, onChange }) => {
   const dispatch = useDispatch();
-  const { loadcart, reload } = useSelector((state) => state.cart);
+  const { loadcart, reload, totalPrice } = useSelector((state) => state.cart);
   const { reloadOnProduct } = useSelector((state) => state.product);
 
   const handleClick = () => {
@@ -33,13 +35,17 @@ const Cart = ({ value, onChange }) => {
   };
 
   const handleIncreaseQuantity = (productId, quantity) => {
-    quantity +=1;
-    dispatch(updateCart({productId, quantity}))
+    quantity += 1;
+    dispatch(updateCart({ productId, quantity }));
   };
 
   const handleDecreaseQuantity = (productId, quantity) => {
-    quantity -=1;
-    dispatch(updateCart({productId, quantity}))
+    quantity -= 1;
+    dispatch(updateCart({ productId, quantity }));
+  };
+
+  const handleCheckOut = () => {
+    dispatch(addOrder());
   };
 
   useEffect(() => {
@@ -50,7 +56,7 @@ const Cart = ({ value, onChange }) => {
 
   return (
     <div>
-      <Toaster/>
+      <Toaster />
       <Dialog open={value} onClose={handleClick} className="relative z-10">
         <DialogBackdrop
           transition
@@ -122,7 +128,8 @@ const Cart = ({ value, onChange }) => {
                                         type="button"
                                         onClick={() =>
                                           handleDecreaseQuantity(
-                                            product.productId, product.quantity
+                                            product.productId,
+                                            product.quantity
                                           )
                                         }
                                         className="flex size-6 items-center justify-center rounded border border-gray-300 text-gray-600 hover:bg-gray-100"
@@ -136,7 +143,8 @@ const Cart = ({ value, onChange }) => {
                                         type="button"
                                         onClick={() =>
                                           handleIncreaseQuantity(
-                                            product.productId, product.quantity
+                                            product.productId,
+                                            product.quantity
                                           )
                                         }
                                         className="flex size-6 items-center justify-center rounded border border-gray-300 text-gray-600 hover:bg-gray-100"
@@ -144,8 +152,6 @@ const Cart = ({ value, onChange }) => {
                                         +
                                       </button>
                                     </div>
-
-
                                   </div>
 
                                   <div className="flex">
@@ -171,18 +177,15 @@ const Cart = ({ value, onChange }) => {
                   <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
                     <div className="flex justify-between text-base font-medium text-gray-900">
                       <p>Subtotal</p>
-                      <p>$262.00</p>
+                      <p>{totalPrice}</p>
                     </div>
-                    <p className="mt-0.5 text-sm text-gray-500">
-                      Shipping and taxes calculated at checkout.
-                    </p>
                     <div className="mt-6">
-                      <a
-                        href="#"
+                      <button
+                        onClick={handleCheckOut}
                         className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-xs hover:bg-indigo-700"
                       >
                         Checkout
-                      </a>
+                      </button>
                     </div>
                     <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                       <p>

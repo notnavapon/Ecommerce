@@ -27,14 +27,12 @@ const LoginPage = () => {
     e.preventDefault();
     const checkAuth = await dispatch(loginUser(loginFormData));
     if (loginUser.fulfilled.match(checkAuth)) {
-      // ถ้า login สำเร็จ → เรียก checkCurrentUser
       dispatch(checkCurrentUser());
       navigate("/");
     } else {
       console.log("Login failed:", checkAuth.payload);
     }
     setUpdate(prev=>!prev)
-    navigate("/");
   };
 
   useEffect(() => {
@@ -132,7 +130,7 @@ const LoginPage = () => {
                         pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
                         className="grow"
                       />
-                      <button onClick={() => setShowPassword((prev) => !prev)}>
+                      <button type="button" onClick={() => setShowPassword((prev) => !prev)}>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"

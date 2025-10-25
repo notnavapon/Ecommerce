@@ -33,16 +33,18 @@ const RegisterPage = () => {
     data.append("email", formData.email);
     data.append("password", formData.password);
     if (profilePic) {
-      data.append("profilePic", profilePic)
+      data.append("profilePic", profilePic);
     }
 
     // for (let pair of data.entries()) {
     //   console.log(pair[0] + ": ", pair[1]);
     // }
 
-    dispatch(registerUser(data));
+    const register = dispatch(registerUser(data));
 
-    // navigate("/login");
+    if (registerUser.fulfilled.match(register)) {
+      navigate("/login");
+    }
   };
 
   const handleChange = (e) => {
@@ -54,7 +56,6 @@ const RegisterPage = () => {
     const file = e.target.files[0];
     if (file) {
       setProfilePic(file);
-      // สร้าง URL ชั่วคราวจากไฟล์
       setPreviewPic(URL.createObjectURL(file));
     }
     console.log(profilePic);

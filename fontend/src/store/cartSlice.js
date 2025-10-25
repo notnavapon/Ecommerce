@@ -70,6 +70,7 @@ export const updateCart = createAsyncThunk("cart/deleteCart", async (data, thunk
 });
 
 const initialState = {
+  totalPrice: null,
   loadcart: [],
   reload: true
 };
@@ -90,6 +91,7 @@ const cartSlice = createSlice({
 
       .addCase(getCart.fulfilled, (state, action) => {
         state.loadcart = action.payload.cart;
+        state.totalPrice = action.payload.totalPrice;
         state.reload = false
       })
 

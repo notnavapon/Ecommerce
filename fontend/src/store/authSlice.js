@@ -30,13 +30,16 @@ export const loginUser = createAsyncThunk(
     const toastId = toast.loading("Logining in...");
     try {
       const response = await api.post("/auth/login", userData);
-      toast.success("Login successfully!", { id: toastId });
       // return แค่ user
-      return response.data.user;
+      return (
+        toast.success("Login successfully!", { id: toastId, duration: 2000 }),
+        response.data.user
+      );
     } catch (error) {
       // console.log(error)
       toast.error(error.response?.data?.message || "Login failed.", {
         id: toastId,
+        duration: 2000,
       });
       return thunkAPI.rejectWithValue(
         error.response?.data || "Something went wrong"
@@ -84,7 +87,7 @@ const initialState = {
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {}, 
+  reducers: {},
   extraReducers: (builder) => {
     builder
 
