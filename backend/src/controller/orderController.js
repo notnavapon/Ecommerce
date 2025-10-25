@@ -1,34 +1,37 @@
 import prisma from "../config/prismaClient.js";
-import { getCart } from "./cartController.js";
 
 export const confirmOrder = async (req, res) => {
   try {
-    const cart = req.body.cart;
-    console.log(cart);
 
-    const newOrder = await prisma.order.create({
-      data: {
+    const cart = await prisma.cart.findMany({
+      where: {userId: req.user.id},
+      include: { product: true },
+    })
+    console.log(cart)
+    
+    if (cart.length === 0) return res.status(400).json({ message: "Cart is empty"})
+
+    const totalPrice = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+
+    const confirmOrderId = await prisma.order.create({
+      data:{
         userId: req.user.id,
-        total: cart.reduce(
-          (sumcost, cart) => sumcost + cart.quantity * cart.product.price,
-          0
-        ),
-        orderItems: {
-          create: cart.map((item) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            price: item.product.price,
+        total: cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0),
+        orderItems :{
+          create: cart.map((item)=>({
+              productId: item.productId,
+              quantity: item.quantity,
+              price: item.product.price,
           })),
         },
       },
-      include: {
-        orderItems: true, // คืนค่า OrderItem ทั้งหมดที่สร้างพร้อมกับ Order
-      },
-    });
+      include:{ orderItems: true},
+    })
+    console.log(confirmOrder)
 
-    //update stock in product, delete cart
+    // update stock in product, delete cart
     await Promise.all(
-      newOrder.orderItems.map(async (item) => {
+      cart.map(async (item) => {
         const product = await prisma.product.findUnique({
           where: { id: item.productId },
         });
@@ -40,20 +43,13 @@ export const confirmOrder = async (req, res) => {
     );
     console.log("All products updated");
 
-    // cart.map((item) => {
-    //   const deletecart = prisma.cart.delete({
-    //     where: { id: item.id },
-    //   });
-
-    //   console.log(deletecart);
-    // });
-
     await Promise.all(
       cart.map((item) => prisma.cart.delete({ where: { id: item.id } }))
     );
     console.log("Deleted all items");
 
-    return res.status(200).json({ newOrder });
+
+    return res.status(200).json({ confirmOrderId });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error });
@@ -67,13 +63,13 @@ export const checkOrderByUserId = async (req, res) => {
       include: {
         orderItems: {
           include: {
-            product: true, // ดึงข้อมูลสินค้าแต่ละชิ้นมาด้วย
+            product: true, 
           },
         },
       },
     });
 
-    return res.status(200).json({ checkOrder });
+    return res.status(200).json({ order: checkOrder });
   } catch (error) {
     return res.status(500).json(error);
   }

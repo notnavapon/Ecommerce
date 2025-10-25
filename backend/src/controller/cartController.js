@@ -13,6 +13,10 @@ export const addCart = async (req, res) => {
 
     const product = await prisma.product.findUnique({ where: { id: productId } });
     if (!product) return res.status(404).json({ message: "Product not found" });
+
+    
+    console.log("product stock :" ,productId)
+
     if (quantity > product.stock) {
       return res.status(400).json({ message: "Not enough stock" });
     }
@@ -20,6 +24,10 @@ export const addCart = async (req, res) => {
     const existing = await prisma.cart.findUnique({
       where: { user_product_unique: { userId, productId } },
     });
+    
+    if ( existing !== null && existing.quantity + quantity > product.stock){
+      return res.status(400).json({ message: "Not enough stock" });
+    }
 
     const cartItem = existing
       ? await prisma.cart.update({
@@ -113,22 +121,30 @@ export const deleteCart = async (req, res) => {
 export const getCart = async (req, res) => {
   try {
     const userId = req.user.id;
+
     const allCart = await prisma.cart.findMany({
       where: { userId },
       include: {
-        product: true, // join product info
+        product: true,
       },
       orderBy: {
-        createdAt: "desc", //
+        createdAt: "desc",
       },
     });
+
+
+    const totalPrice = allCart.reduce((sum, item) => {
+      return sum + item.product.price * item.quantity;
+    }, 0);
 
     res.status(200).json({
       message: "Cart fetched successfully",
       cart: allCart,
+      totalPrice, 
     });
   } catch (error) {
     console.error("Error fetching cart:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
